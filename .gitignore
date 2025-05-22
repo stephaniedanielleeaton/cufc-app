@@ -1,5 +1,33 @@
+# Dependencies
 node_modules/
+
+# Build outputs
 dist/
+
+# Environment variables
 .env
+.env.test
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
 npm-debug.log
+logs
+*.log
+
+# Coverage reports
+coverage/
+.nyc_output/
+test-report.xml
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
 .DS_Store
+Thumbs.db

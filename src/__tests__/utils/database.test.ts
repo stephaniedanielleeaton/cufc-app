@@ -53,16 +53,21 @@ describe('Database Utility', () => {
       const originalUri = config.mongo.uri;
       Object.defineProperty(config.mongo, 'uri', { value: '' });
 
-      // Mock process.exit
-      const mockExit = jest.spyOn(process, 'exit').mockImplementation((code) => {
-        throw new Error(`Process exited with code: ${code}`);
-      });
+      // Save original process.exit
+      const originalExit = process.exit;
+      
+      // Completely mock process.exit to prevent test process termination
+      process.exit = jest.fn() as any;
 
-      await expect(connectDB()).rejects.toThrow();
+      // Call the function that would trigger process.exit
+      await connectDB().catch(() => {/* catch error to continue test */});
 
-      // Restore original URI
+      // Verify process.exit was called with code 1
+      expect(process.exit).toHaveBeenCalledWith(1);
+
+      // Restore original URI and process.exit
       Object.defineProperty(config.mongo, 'uri', { value: originalUri });
-      mockExit.mockRestore();
+      process.exit = originalExit;
     });
   });
 
