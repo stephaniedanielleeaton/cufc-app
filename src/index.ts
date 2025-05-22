@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { connectDB } from './utils/database';
 
 // Load environment variables
 dotenv.config();
@@ -8,6 +9,11 @@ dotenv.config();
 // Initialize express app
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
+
+// Connect to MongoDB
+connectDB()
+  .then(() => console.log('MongoDB connection established'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // Middlewares
 app.use(cors());
