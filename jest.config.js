@@ -13,5 +13,7 @@ module.exports = {
     'src/**/*.ts',
     '!src/**/*.d.ts',
     '!src/**/__tests__/**'
-  ]
+  ],
+  coverageReporters: ['text', 'lcov', 'json', 'html'],
+  testResultsProcessor: 'jest-sonar-reporter'
 };
