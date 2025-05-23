@@ -1,20 +1,19 @@
 import request from 'supertest';
 import express from 'express';
 
-// Mock the database connection
 jest.mock('../utils/database', () => ({
   connectDB: jest.fn().mockResolvedValue(undefined),
   disconnectDB: jest.fn().mockResolvedValue(undefined)
 }));
 
-// Create a separate test app to avoid port conflicts
+
+
 const createTestApp = () => {
-  // Use dynamic import to prevent app from connecting to DB during tests
+ 
   jest.isolateModules(() => {
     require('../index');
   });
   
-  // Create simplified version of app for testing
   const app = express();
   app.get('/', (req, res) => {
     res.send('CUFC Backend API is running!');
