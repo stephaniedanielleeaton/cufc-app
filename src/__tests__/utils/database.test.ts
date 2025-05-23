@@ -2,100 +2,83 @@ import mongoose from 'mongoose';
 import { connectDB, disconnectDB } from '../../utils/database';
 import { config } from '../../config';
 
-// Mock mongoose
-jest.mock('mongoose', () => ({
-  connect: jest.fn(),
-  disconnect: jest.fn()
+jest.mock('mongoose');
+const mockedMongoose = mongoose as jest.Mocked<typeof mongoose>;
+
+jest.mock('../../config', () => ({
+  config: {
+    mongo: { uri: 'mongodb://localhost:27017/testdb' }
+  }
 }));
 
-// Mock console methods
-const originalConsoleLog = console.log;
-const originalConsoleError = console.error;
+describe('database utils', () => {
+  let originalEnv: NodeJS.ProcessEnv;
+  let processExitSpy: jest.SpyInstance;
+  let consoleLogSpy: jest.SpyInstance;
+  let consoleErrorSpy: jest.SpyInstance;
 
-describe('Database Utility', () => {
   beforeEach(() => {
-    // Clear mocks
-    jest.clearAllMocks();
-    // Mock console methods
-    console.log = jest.fn();
-    console.error = jest.fn();
+    originalEnv = { ...process.env };
+    processExitSpy = jest.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    // Restore console methods
-    console.log = originalConsoleLog;
-    console.error = originalConsoleError;
+    jest.clearAllMocks();
+    process.env = originalEnv;
   });
 
   describe('connectDB', () => {
-    it('should connect to MongoDB with correct URI and options', async () => {
-      // Mock successful connection
-      (mongoose.connect as jest.Mock).mockResolvedValueOnce({
-        connection: { host: 'test-host' }
-      });
-
+    it('should connect to MongoDB and log success', async () => {
+      mockedMongoose.connect.mockResolvedValue({ connection: { host: 'localhost' } } as any);
       await connectDB();
-
-      // Check if mongoose.connect was called with correct params
-      expect(mongoose.connect).toHaveBeenCalledWith(config.mongo.uri, {
-        autoIndex: true,
-        autoCreate: true
-      });
-
-      // Check if success message was logged
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('MongoDB Connected')
-      );
+      expect(mockedMongoose.connect).toHaveBeenCalledWith('mongodb://localhost:27017/testdb', expect.any(Object));
+      expect(consoleLogSpy).toHaveBeenCalledWith('MongoDB Connected: localhost');
     });
 
-    it('should handle connection errors', async () => {
-      // Mock missing URI
-      const originalUri = config.mongo.uri;
-      Object.defineProperty(config.mongo, 'uri', { value: '' });
+    it('should throw error if URI is not defined', async () => {
+      jest.resetModules();
+      jest.doMock('../../config', () => ({ config: { mongo: { uri: '' } } }));
+      const { connectDB: connectDBReloaded } = require('../../utils/database');
+      await connectDBReloaded();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('MongoDB URI is not defined'));
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
 
-      // Save original process.exit
-      const originalExit = process.exit;
-      
-      // Completely mock process.exit to prevent test process termination
-      process.exit = jest.fn() as any;
+    it('should handle connection error and exit process', async () => {
+      mockedMongoose.connect.mockRejectedValue(new Error('Failed to connect'));
+      await connectDB();
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error connecting to MongoDB: Failed to connect');
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
 
-      // Call the function that would trigger process.exit
-      await connectDB().catch(() => {/* catch error to continue test */});
-
-      // Verify process.exit was called with code 1
-      expect(process.exit).toHaveBeenCalledWith(1);
-
-      // Restore original URI and process.exit
-      Object.defineProperty(config.mongo, 'uri', { value: originalUri });
-      process.exit = originalExit;
+    it('should handle unknown error and exit process', async () => {
+      mockedMongoose.connect.mockRejectedValue('some string error');
+      await connectDB();
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error connecting to MongoDB: Unknown error');
+      expect(processExitSpy).toHaveBeenCalledWith(1);
     });
   });
 
   describe('disconnectDB', () => {
-    it('should disconnect from MongoDB', async () => {
-      // Mock successful disconnection
-      (mongoose.disconnect as jest.Mock).mockResolvedValueOnce(undefined);
-
+    it('should disconnect from MongoDB and log success', async () => {
+      mockedMongoose.disconnect.mockResolvedValue();
       await disconnectDB();
-
-      // Check if mongoose.disconnect was called
-      expect(mongoose.disconnect).toHaveBeenCalled();
-      
-      // Check if success message was logged
-      expect(console.log).toHaveBeenCalledWith('MongoDB Disconnected');
+      expect(mockedMongoose.disconnect).toHaveBeenCalled();
+      expect(consoleLogSpy).toHaveBeenCalledWith('MongoDB Disconnected');
     });
 
-    it('should handle disconnection errors', async () => {
-      // Mock disconnection error
-      const mockError = new Error('Disconnection failed');
-      (mongoose.disconnect as jest.Mock).mockRejectedValueOnce(mockError);
-
+    it('should handle disconnect error', async () => {
+      mockedMongoose.disconnect.mockRejectedValue(new Error('Disconnect failed'));
       await disconnectDB();
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error disconnecting from MongoDB: Disconnect failed');
+    });
 
-      // Check if error message was logged
-      expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining('Error disconnecting from MongoDB')
-      );
+    it('should handle unknown disconnect error', async () => {
+      mockedMongoose.disconnect.mockRejectedValue('some string error');
+      await disconnectDB();
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error disconnecting from MongoDB: Unknown error');
     });
   });
 });

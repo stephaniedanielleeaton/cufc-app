@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './utils/database';
+import apiRoutes from './routes';
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,9 @@ connectDB()
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Mount API routes
+app.use('/api', apiRoutes);
 
 // Root route
 app.get('/', (req: Request, res: Response) => {
