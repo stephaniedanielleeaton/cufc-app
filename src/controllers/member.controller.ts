@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { MemberService } from '../services/member.service';
 
 export class MemberController {
-  private memberService: MemberService;
+  private readonly memberService: MemberService;
 
   constructor(memberService = new MemberService()) {
     this.memberService = memberService;

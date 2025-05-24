@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import { MemberController } from '../controllers/member.controller';
+import { checkJwt } from '../middleware/auth0.middleware';
 
 const router = Router();
 const memberController = new MemberController();
+
+router.use(checkJwt);
 
 router.get('/', memberController.getAllMembers.bind(memberController));
 router.get('/:id', memberController.getMemberById.bind(memberController));
