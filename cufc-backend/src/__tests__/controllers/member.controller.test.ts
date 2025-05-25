@@ -1,3 +1,7 @@
+jest.mock('../../middleware/auth0.middleware', () => ({
+  checkJwt: (req: any, res: any, next: any) => next()
+}));
+
 import { MemberController } from '../../controllers/member.controller';
 import { MemberService } from '../../services/member.service';
 import { Request, Response } from 'express';

@@ -24,9 +24,24 @@ app.use(express.urlencoded({ extended: true }));
 // Mount API routes
 app.use('/api', apiRoutes);
 
+// Test endpoint
+app.get('/api/test', (req: Request, res: Response) => {
+  res.json({ value: 'Hello from backend!' });
+});
+
 // Root route
 app.get('/', (req: Request, res: Response) => {
   res.send('CUFC Backend API is running!');
+});
+
+import path from 'path';
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../../cufc-frontend/build')));
+
+// Fallback: serve React's index.html for any unknown route (except API)
+app.get(/^\/(?!api).*/, (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, '../../cufc-frontend/build', 'index.html'));
 });
 
 // Start server

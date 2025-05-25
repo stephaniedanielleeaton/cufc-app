@@ -1,3 +1,7 @@
+jest.mock('../../middleware/auth0.middleware', () => ({
+  checkJwt: (req: any, res: any, next: any) => next()
+}));
+
 import request from 'supertest';
 import express, { Application } from 'express';
 import apiRoutes from '../../routes';

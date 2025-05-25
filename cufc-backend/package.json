@@ -8,7 +8,8 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "heroku-postbuild": "cd ../cufc-frontend && npm install && npm run build"
   },
   "keywords": [],
   "author": "",

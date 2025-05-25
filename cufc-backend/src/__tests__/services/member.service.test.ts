@@ -1,3 +1,7 @@
+jest.mock('../../middleware/auth0.middleware', () => ({
+  checkJwt: (req: any, res: any, next: any) => next()
+}));
+
 import Member, { IMember, MemberDocument } from '../../models/member.model';
 import { MemberService } from '../../services/member.service';
 import mongoose from 'mongoose';
