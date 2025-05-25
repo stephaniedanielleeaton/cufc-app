@@ -6,12 +6,11 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "build": "tsc",
+    "build": "node_modules/.bin/tsc",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "heroku-postbuild": "cd cufc-frontend && npm install && npm run build",
-    "heroku-prebuild": "npm run build",
-    "postinstall": "npm install typescript"
+    "heroku-postbuild": "npm run build && cd cufc-frontend && npm install && npm run build",
+    "heroku-prebuild": "npm run build"
   },
   "keywords": [],
   "author": "",
