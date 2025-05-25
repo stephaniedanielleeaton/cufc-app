@@ -1,8 +1,19 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Run backend tests
+echo "Running backend tests..."
 npm test
+BACKEND_EXIT_CODE=$?
 
-# Run frontend tests
+echo "Running frontend tests..."
 cd cufc-frontend && npm test
+FRONTEND_EXIT_CODE=$?
+
+# Exit with error if any tests failed
+if [ $BACKEND_EXIT_CODE -ne 0 ] || [ $FRONTEND_EXIT_CODE -ne 0 ]; then
+  echo "Tests failed. Push aborted."
+  exit 1
+fi
+
+echo "All tests passed!"
+exit 0
