@@ -9,7 +9,10 @@
     "build": "npx tsc --project tsconfig.json",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "npm run build",
+    "dev:backend": "nodemon src/index.ts",
+    "dev:frontend": "cd cufc-frontend && npm start",
+    "dev:all": "npm-run-all --parallel dev:backend dev:frontend"
   },
   "keywords": [],
   "author": "",
@@ -18,21 +21,21 @@
     "node": "20.x"
   },
   "dependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/express-jwt": "^7.0.0",
+    "@types/express-rate-limit": "^6.0.0",
+    "@types/express-validator": "^3.0.0",
+    "@types/node": "^22.15.21",
     "cors": "^2.8.5",
-    "typescript": "^4.9.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-jwt": "^8.5.1",
     "express-rate-limit": "^7.5.0",
-    "@types/express": "^5.0.2",
-    "@types/cors": "^2.8.18",
-    "@types/node": "^22.15.21",
-    "@types/express-jwt": "^7.0.0",
-    "@types/express-rate-limit": "^6.0.0",
-    "@types/express-validator": "^3.0.0",
     "express-validator": "^7.2.1",
     "jwks-rsa": "^3.2.0",
-    "mongoose": "^8.15.0"
+    "mongoose": "^8.15.0",
+    "typescript": "^4.9.5"
   },
   "jestSonar": {
     "reportPath": "coverage",
@@ -50,6 +53,7 @@
     "jest-sonar-reporter": "^2.0.0",
     "mongodb-memory-server": "^10.1.4",
     "nodemon": "^3.1.10",
+    "npm-run-all": "4.1.5",
     "supertest": "^7.1.1",
     "ts-jest": "^29.3.4",
     "ts-node": "^10.9.2"
