@@ -6,10 +6,12 @@ import { MemberController } from '../../controllers/member.controller';
 import { MemberService } from '../../services/member.service';
 import { Request, Response } from 'express';
 import { IMember, MemberDocument } from '../../models/member.model';
-import { validationResult } from 'express-validator';
+import * as expressValidator from 'express-validator';
 
 jest.mock('../../services/member.service');
-jest.mock('express-validator');
+jest.mock('express-validator', () => ({
+  validationResult: jest.fn()
+}));
 
 describe('MemberController', () => {
   let controller: MemberController;
@@ -135,13 +137,13 @@ describe('MemberController', () => {
 
   describe('createMember', () => {
     it('should handle validation errors and return 422', async () => {
-      jest.spyOn(require('express-validator'), 'validationResult').mockReturnValue({ isEmpty: () => false, array: () => [{ msg: 'Validation failed' }] } as any);
+      (expressValidator.validationResult as jest.Mock).mockReturnValue({ isEmpty: () => false, array: () => [{ msg: 'Validation failed' }] });
       await controller.createMember(req as Request, res as Response);
       expect(statusMock).toHaveBeenCalledWith(422);
       expect(jsonMock).toHaveBeenCalledWith({ success: false, errors: [{ msg: 'Validation failed' }] });
     });
     it('should create a new member and return 201', async () => {
-      jest.spyOn(require('express-validator'), 'validationResult').mockReturnValue({ isEmpty: () => true } as any);
+      (expressValidator.validationResult as jest.Mock).mockReturnValue({ isEmpty: () => true });
       memberServiceMock.createMember.mockResolvedValue(mockMember as MemberDocument);
       req.body = mockMember;
       await controller.createMember(req as Request, res as Response);
@@ -150,7 +152,7 @@ describe('MemberController', () => {
       expect(jsonMock).toHaveBeenCalledWith({ success: true, data: mockMember });
     });
     it('should handle errors and return 400 for thrown Error', async () => {
-      jest.spyOn(require('express-validator'), 'validationResult').mockReturnValue({ isEmpty: () => true } as any);
+      (expressValidator.validationResult as jest.Mock).mockReturnValue({ isEmpty: () => true });
       memberServiceMock.createMember.mockRejectedValue(new Error('fail'));
       req.body = mockMember;
       await controller.createMember(req as Request, res as Response);
@@ -158,7 +160,7 @@ describe('MemberController', () => {
       expect(jsonMock).toHaveBeenCalledWith({ success: false, error: 'fail' });
     });
     it('should handle errors and return 400 for thrown non-Error', async () => {
-      jest.spyOn(require('express-validator'), 'validationResult').mockReturnValue({ isEmpty: () => true } as any);
+      (expressValidator.validationResult as jest.Mock).mockReturnValue({ isEmpty: () => true });
       memberServiceMock.createMember.mockRejectedValue('fail');
       req.body = mockMember;
       await controller.createMember(req as Request, res as Response);

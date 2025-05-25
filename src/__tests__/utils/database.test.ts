@@ -2,8 +2,18 @@ import mongoose from 'mongoose';
 import { connectDB, disconnectDB } from '../../utils/database';
 import { config } from '../../config';
 
-jest.mock('mongoose');
-const mockedMongoose = mongoose as jest.Mocked<typeof mongoose>;
+// Mock mongoose
+jest.mock('mongoose', () => ({
+  connect: jest.fn().mockResolvedValue({ connection: { host: 'localhost' } }),
+  disconnect: jest.fn().mockResolvedValue(undefined),
+  connection: {
+    close: jest.fn().mockResolvedValue(undefined),
+    host: 'localhost'
+  }
+}));
+
+// Access the mocked functions directly from the mongoose import
+// This avoids TypeScript errors with complex types
 
 jest.mock('../../config', () => ({
   config: {
@@ -20,8 +30,8 @@ describe('database utils', () => {
   beforeEach(() => {
     originalEnv = { ...process.env };
     processExitSpy = jest.spyOn(process, 'exit').mockImplementation(() => undefined as never);
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => { /* empty mock */ });
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { /* empty mock */ });
   });
 
   afterEach(() => {
@@ -31,30 +41,32 @@ describe('database utils', () => {
 
   describe('connectDB', () => {
     it('should connect to MongoDB and log success', async () => {
-      mockedMongoose.connect.mockResolvedValue({ connection: { host: 'localhost' } } as any);
+      // No need to mock again, already mocked in the jest.mock call
       await connectDB();
-      expect(mockedMongoose.connect).toHaveBeenCalledWith('mongodb://localhost:27017/testdb', expect.any(Object));
+      expect(mongoose.connect).toHaveBeenCalledWith('mongodb://localhost:27017/testdb', expect.any(Object));
       expect(consoleLogSpy).toHaveBeenCalledWith('MongoDB Connected: localhost');
     });
 
     it('should throw error if URI is not defined', async () => {
       jest.resetModules();
       jest.doMock('../../config', () => ({ config: { mongo: { uri: '' } } }));
-      const { connectDB: connectDBReloaded } = require('../../utils/database');
-      await connectDBReloaded();
+      // Using dynamic import instead of require to fix ESLint error
+      const databaseModule = await import('../../utils/database');
+      await databaseModule.connectDB();
       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('MongoDB URI is not defined'));
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
 
     it('should handle connection error and exit process', async () => {
-      mockedMongoose.connect.mockRejectedValue(new Error('Failed to connect'));
+      // Reset the mock and set up a new rejection
+      jest.spyOn(mongoose, 'connect').mockRejectedValueOnce(new Error('Failed to connect'));
       await connectDB();
       expect(consoleErrorSpy).toHaveBeenCalledWith('Error connecting to MongoDB: Failed to connect');
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
 
     it('should handle unknown error and exit process', async () => {
-      mockedMongoose.connect.mockRejectedValue('some string error');
+      jest.spyOn(mongoose, 'connect').mockRejectedValueOnce('some string error');
       await connectDB();
       expect(consoleErrorSpy).toHaveBeenCalledWith('Error connecting to MongoDB: Unknown error');
       expect(processExitSpy).toHaveBeenCalledWith(1);
@@ -63,20 +75,20 @@ describe('database utils', () => {
 
   describe('disconnectDB', () => {
     it('should disconnect from MongoDB and log success', async () => {
-      mockedMongoose.disconnect.mockResolvedValue();
+      // Already mocked in the jest.mock setup
       await disconnectDB();
-      expect(mockedMongoose.disconnect).toHaveBeenCalled();
+      expect(mongoose.disconnect).toHaveBeenCalled();
       expect(consoleLogSpy).toHaveBeenCalledWith('MongoDB Disconnected');
     });
 
     it('should handle disconnect error', async () => {
-      mockedMongoose.disconnect.mockRejectedValue(new Error('Disconnect failed'));
+      jest.spyOn(mongoose, 'disconnect').mockRejectedValueOnce(new Error('Disconnect failed'));
       await disconnectDB();
       expect(consoleErrorSpy).toHaveBeenCalledWith('Error disconnecting from MongoDB: Disconnect failed');
     });
 
     it('should handle unknown disconnect error', async () => {
-      mockedMongoose.disconnect.mockRejectedValue('some string error');
+      jest.spyOn(mongoose, 'disconnect').mockRejectedValueOnce('some string error');
       await disconnectDB();
       expect(consoleErrorSpy).toHaveBeenCalledWith('Error disconnecting from MongoDB: Unknown error');
     });

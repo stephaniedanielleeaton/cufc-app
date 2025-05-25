@@ -29,6 +29,7 @@ This project uses Husky to enforce code quality standards:
   - Runs backend tests (`npm test`)
   - Runs frontend tests (`cd cufc-frontend && npm test`)
   - Prevents pushing code with failing tests
+  - Successfully tested and working
 
 ### Local Development with Hot Reloading
 
