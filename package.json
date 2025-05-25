@@ -9,8 +9,7 @@
     "build": "npx tsc --project tsconfig.json",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "heroku-postbuild": "npm run build && cd cufc-frontend && npm install && npm run build",
-    "heroku-prebuild": "npm ci && npm run build"
+    "heroku-postbuild": "npm run build"
   },
   "keywords": [],
   "author": "",
