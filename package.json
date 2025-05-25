@@ -23,11 +23,13 @@
     "node": "20.x"
   },
   "lint-staged": {
+    "*.md": ["echo Skipping markdown files"],
+    "*.{json,yml,yaml}": ["echo Skipping config files"],
     "src/**/*.{ts,js}": [
       "npm run lint -- --fix"
     ],
     "cufc-frontend/src/**/*.{ts,tsx,js,jsx}": [
-      "cd cufc-frontend && npm run lint"
+      "npm --prefix ./cufc-frontend run lint"
     ]
   },
   "dependencies": {
