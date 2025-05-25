@@ -12,9 +12,7 @@ export class ConfigController {
   async getPublicConfig(req: Request, res: Response): Promise<void> {
     // Only expose variables that are safe for the client
     const publicConfig = {
-      apiUrl: process.env.API_URL || '',
-      auth0Domain: process.env.AUTH0_DOMAIN || '',
-      auth0ClientId: process.env.AUTH0_CLIENT_ID || '',
+      testVar: process.env.WEB_CLIENT_TEST_VAR || 'default_test_value',
       environment: process.env.NODE_ENV || 'development'
     };
 

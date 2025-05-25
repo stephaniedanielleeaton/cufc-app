@@ -3,9 +3,7 @@
  */
 
 export interface AppConfig {
-  apiUrl: string;
-  auth0Domain: string;
-  auth0ClientId: string;
+  testVar: string;
   environment: string;
 }
 
@@ -27,15 +25,14 @@ export async function getConfig(): Promise<AppConfig> {
       throw new Error(`Failed to fetch config: ${response.statusText}`);
     }
     
-    cachedConfig = await response.json();
-    return cachedConfig;
+    const config = await response.json() as AppConfig;
+    cachedConfig = config;
+    return config;
   } catch (error) {
     console.error('Error fetching configuration:', error);
     // Return default values as fallback
     return {
-      apiUrl: '',
-      auth0Domain: '',
-      auth0ClientId: '',
+      testVar: 'fallback_test_value',
       environment: 'development'
     };
   }

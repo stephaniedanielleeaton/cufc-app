@@ -1,15 +1,30 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { getConfig, AppConfig } from './utils/config';
 
 function App() {
   const [backendValue, setBackendValue] = React.useState('');
+  const [config, setConfig] = React.useState<AppConfig | null>(null);
+  const [configLoading, setConfigLoading] = React.useState(true);
 
   React.useEffect(() => {
+    // Fetch backend test value
     fetch('/api/test')
       .then((res) => res.json())
       .then((data) => setBackendValue(data.value))
       .catch(() => setBackendValue('Error connecting to backend'));
+    
+    // Fetch configuration from backend
+    getConfig()
+      .then(configData => {
+        setConfig(configData);
+        setConfigLoading(false);
+      })
+      .catch(error => {
+        console.error('Failed to load config:', error);
+        setConfigLoading(false);
+      });
   }, []);
 
   return (
@@ -20,10 +35,13 @@ function App() {
           <strong>Backend Test Value:</strong> {backendValue || 'Loading...'}
         </p>
         <p>
-          <strong>REACT_APP_CUSTOM_VAR:</strong> {process.env.REACT_APP_CUSTOM_VAR || 'Not Set'}
+          <strong>Environment:</strong> {configLoading ? 'Loading...' : config?.environment || 'Not Set'}
         </p>
         <p>
-          (Set this environment variable in Heroku to verify the build)
+          <strong>WEB_CLIENT_TEST_VAR:</strong> {configLoading ? 'Loading...' : config?.testVar || 'Not Set'}
+        </p>
+        <p>
+          (These values are loaded from backend environment variables)
         </p>
       </header>
     </div>
