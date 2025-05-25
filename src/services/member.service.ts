@@ -3,6 +3,26 @@ import mongoose from 'mongoose';
 
 export class MemberService {
 
+  async getMemberByAuth0Id(auth0Id: string): Promise<MemberDocument | null> {
+    try {
+      return await Member.findOne({ auth0Id });
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  async updateMemberByAuth0Id(auth0Id: string, updateData: Partial<IMember>): Promise<MemberDocument | null> {
+    try {
+      return await Member.findOneAndUpdate(
+        { auth0Id },
+        updateData,
+        { new: true, runValidators: true }
+      );
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
   async createMember(memberData: Partial<IMember>): Promise<MemberDocument> {
     try {
       const member = new Member(memberData);

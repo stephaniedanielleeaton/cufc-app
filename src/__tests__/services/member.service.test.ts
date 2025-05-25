@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 jest.mock('../../models/member.model');
 
 const mockMemberData: IMember = {
+  auth0Id: 'auth0|user123',
   display_first_name: 'John',
   display_last_name: 'Doe',
   personal_info: {
@@ -133,6 +134,46 @@ describe('MemberService', () => {
       memberModelMock.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error('Database error'));
       jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
       await expect(service.updateMember('507f1f77bcf86cd799439011', {})).rejects.toThrow('Database error');
+    });
+  });
+
+  describe('getMemberByAuth0Id', () => {
+    it('should return a member by auth0Id', async () => {
+      memberModelMock.findOne = jest.fn().mockResolvedValue(mockMemberData);
+      const result = await service.getMemberByAuth0Id('auth0|user123');
+      expect(memberModelMock.findOne).toHaveBeenCalledWith({ auth0Id: 'auth0|user123' });
+      expect(result).toEqual(mockMemberData);
+    });
+
+    it('should return null if not found', async () => {
+      memberModelMock.findOne = jest.fn().mockResolvedValue(null);
+      const result = await service.getMemberByAuth0Id('auth0|user123');
+      expect(result).toBeNull();
+    });
+
+    it('should handle errors', async () => {
+      memberModelMock.findOne = jest.fn().mockRejectedValue(new Error('Database error'));
+      await expect(service.getMemberByAuth0Id('auth0|user123')).rejects.toThrow('Database error');
+    });
+  });
+
+  describe('updateMemberByAuth0Id', () => {
+    it('should update and return the member by auth0Id', async () => {
+      memberModelMock.findOneAndUpdate = jest.fn().mockResolvedValue(mockMemberData);
+      const result = await service.updateMemberByAuth0Id('auth0|user123', { display_first_name: 'Jane' });
+      expect(memberModelMock.findOneAndUpdate).toHaveBeenCalledWith({ auth0Id: 'auth0|user123' }, { display_first_name: 'Jane' }, { new: true, runValidators: true });
+      expect(result).toEqual(mockMemberData);
+    });
+
+    it('should return null if not found', async () => {
+      memberModelMock.findOneAndUpdate = jest.fn().mockResolvedValue(null);
+      const result = await service.updateMemberByAuth0Id('auth0|user123', { display_first_name: 'Jane' });
+      expect(result).toBeNull();
+    });
+
+    it('should handle errors', async () => {
+      memberModelMock.findOneAndUpdate = jest.fn().mockRejectedValue(new Error('Database error'));
+      await expect(service.updateMemberByAuth0Id('auth0|user123', { display_first_name: 'Jane' })).rejects.toThrow('Database error');
     });
   });
 

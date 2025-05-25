@@ -1,6 +1,7 @@
 import { Schema, model, HydratedDocument } from 'mongoose';
 
 export interface IMember {
+  auth0Id: string;
   display_first_name: string;
   display_last_name: string;
   personal_info: {
@@ -48,6 +49,7 @@ const PersonalInfoSchema = new Schema<IMember['personal_info']>({
 });
 
 const MemberSchema = new Schema<IMember>({
+  auth0Id: { type: String, required: true, unique: true },
   display_first_name: { type: String, required: true },
   display_last_name: { type: String, required: true },
   personal_info: { type: PersonalInfoSchema, required: true },
