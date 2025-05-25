@@ -1,1 +1,1 @@
-web: npm start --prefix cufc-backend
+web: npm start
