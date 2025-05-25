@@ -16,6 +16,20 @@ Backend services for the CUFC application built with Node.js, Express, and TypeS
 3. Install frontend dependencies: `cd cufc-frontend && npm install`
 4. Create a `.env` file based on `.env.example`
 
+### Code Quality with Git Hooks
+
+This project uses Husky to enforce code quality standards:
+
+- **Pre-commit Hook**: Runs ESLint on staged files
+  - Prevents committing code with linting errors
+  - Only checks files that are being committed
+  - Checks both backend and frontend code
+
+- **Pre-push Hook**: Runs tests before pushing
+  - Runs backend tests (`npm test`)
+  - Runs frontend tests (`cd cufc-frontend && npm test`)
+  - Prevents pushing code with failing tests
+
 ### Local Development with Hot Reloading
 
 For the best development experience with hot reloading for both frontend and backend:

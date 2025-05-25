@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run backend tests
+npm test
+
+# Run frontend tests
+cd cufc-frontend && npm test
