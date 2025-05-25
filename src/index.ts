@@ -9,7 +9,7 @@ dotenv.config();
 
 // Initialize express app
 const app: Application = express();
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT ?? 3001;
 
 // Connect to MongoDB
 connectDB()
@@ -29,19 +29,14 @@ app.get('/api/test', (req: Request, res: Response) => {
   res.json({ value: 'Hello from backend!' });
 });
 
-// Root route
-app.get('/', (req: Request, res: Response) => {
-  res.send('CUFC Backend API is running!');
-});
-
 import path from 'path';
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../../cufc-frontend/build')));
+app.use(express.static(path.join(__dirname, '../cufc-frontend/build')));
 
 // Fallback: serve React's index.html for any unknown route (except API)
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '../../cufc-frontend/build', 'index.html'));
+  res.sendFile(path.join(__dirname, '../cufc-frontend/build', 'index.html'));
 });
 
 // Start server
