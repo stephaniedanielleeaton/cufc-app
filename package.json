@@ -10,7 +10,8 @@
     "test": "jest",
     "test:watch": "jest --watchAll",
     "heroku-postbuild": "cd cufc-frontend && npm install && npm run build",
-    "heroku-prebuild": "npm run build"
+    "heroku-prebuild": "npm run build",
+    "postinstall": "npm install typescript"
   },
   "keywords": [],
   "author": "",
