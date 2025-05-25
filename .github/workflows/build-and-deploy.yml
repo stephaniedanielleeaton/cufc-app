@@ -1,0 +1,45 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install Backend Dependencies
+      run: npm ci
+    
+    - name: Build Backend
+      run: npm run build
+    
+    - name: Build Frontend
+      run: |
+        cd cufc-frontend
+        npm ci
+        npm run build
+    
+    - name: Configure Git
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+    
+    - name: Commit Build Folder
+      run: |
+        git add cufc-frontend/build -f
+        git commit -m "chore: update React build" || echo "No changes to commit"
+        git push origin ${GITHUB_REF#refs/heads/}

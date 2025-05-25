@@ -9,7 +9,7 @@
 /coverage
 
 # production
-# /build  # Commented out to include the build folder in the repository
+/build
 
 # misc
 .DS_Store
