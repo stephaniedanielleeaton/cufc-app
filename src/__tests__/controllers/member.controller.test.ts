@@ -137,13 +137,15 @@ describe('MemberController', () => {
 
   describe('createMember', () => {
     it('should handle validation errors and return 422', async () => {
-      (expressValidator.validationResult as jest.Mock).mockReturnValue({ isEmpty: () => false, array: () => [{ msg: 'Validation failed' }] });
+      const mockValidationResult = { isEmpty: () => false, array: () => [{ msg: 'Validation failed' }] };
+      (expressValidator.validationResult as unknown as jest.Mock).mockReturnValue(mockValidationResult);
       await controller.createMember(req as Request, res as Response);
       expect(statusMock).toHaveBeenCalledWith(422);
       expect(jsonMock).toHaveBeenCalledWith({ success: false, errors: [{ msg: 'Validation failed' }] });
     });
     it('should create a new member and return 201', async () => {
-      (expressValidator.validationResult as jest.Mock).mockReturnValue({ isEmpty: () => true });
+      const mockValidationResult = { isEmpty: () => true };
+      (expressValidator.validationResult as unknown as jest.Mock).mockReturnValue(mockValidationResult);
       memberServiceMock.createMember.mockResolvedValue(mockMember as MemberDocument);
       req.body = mockMember;
       await controller.createMember(req as Request, res as Response);
@@ -152,7 +154,8 @@ describe('MemberController', () => {
       expect(jsonMock).toHaveBeenCalledWith({ success: true, data: mockMember });
     });
     it('should handle errors and return 400 for thrown Error', async () => {
-      (expressValidator.validationResult as jest.Mock).mockReturnValue({ isEmpty: () => true });
+      const mockValidationResult = { isEmpty: () => true };
+      (expressValidator.validationResult as unknown as jest.Mock).mockReturnValue(mockValidationResult);
       memberServiceMock.createMember.mockRejectedValue(new Error('fail'));
       req.body = mockMember;
       await controller.createMember(req as Request, res as Response);
@@ -160,7 +163,8 @@ describe('MemberController', () => {
       expect(jsonMock).toHaveBeenCalledWith({ success: false, error: 'fail' });
     });
     it('should handle errors and return 400 for thrown non-Error', async () => {
-      (expressValidator.validationResult as jest.Mock).mockReturnValue({ isEmpty: () => true });
+      const mockValidationResult = { isEmpty: () => true };
+      (expressValidator.validationResult as unknown as jest.Mock).mockReturnValue(mockValidationResult);
       memberServiceMock.createMember.mockRejectedValue('fail');
       req.body = mockMember;
       await controller.createMember(req as Request, res as Response);
