@@ -31,24 +31,11 @@ jobs:
     - name: Build Backend
       run: npm run build
     
-    - name: Setup Frontend
-      run: |
-        cd cufc-frontend
-        npm ci
-    
     - name: Build Frontend
       run: |
         cd cufc-frontend
+        npm ci
         npm run build
-      env:
-        NODE_ENV: production
-    
-    - name: Move Frontend Build
-      run: |
-        # Create the dist directory in the root
-        mkdir -p dist
-        # Copy the built files to the root dist directory
-        cp -r cufc-frontend/dist/* dist/
     
     - name: Configure Git
       run: |
@@ -57,6 +44,6 @@ jobs:
     
     - name: Commit Build Folder
       run: |
-        git add dist -f
-        git commit -m "chore: update Vite build" || echo "No changes to commit"
+        git add cufc-frontend/build -f
+        git commit -m "chore: update React build" || echo "No changes to commit"
         git push
