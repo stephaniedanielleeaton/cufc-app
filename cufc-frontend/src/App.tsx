@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
-import { getConfig, AppConfig } from './utils/config';
+import { getConfig } from './utils/config';
+import type { AppConfig } from './utils/config';
 
 function App() {
   const [backendValue, setBackendValue] = React.useState('');
