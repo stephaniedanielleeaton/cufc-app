@@ -40,7 +40,7 @@ const possiblePaths = [
 ];
 
 // Find the first valid path with index.html
-let buildPath = null;
+let buildPath: string | null = null;
 for (const p of possiblePaths) {
   if (fs.existsSync(path.join(p, 'index.html'))) {
     buildPath = p;
