@@ -31,22 +31,32 @@ app.get('/api/test', (_req: Request, res: Response) => {
   res.json({ value: 'Hello from backend!' });
 });
 
-// Determine the frontend build path (works for both CRA and Vite)
-const buildPath = fs.existsSync(path.join(__dirname, '../cufc-frontend/build')) 
-  ? path.join(__dirname, '../cufc-frontend/build') 
-  : path.join(__dirname, '../cufc-frontend/dist');
+// Use the consistent frontend build path that we're setting in GitHub workflow
+const buildPath = path.join(__dirname, '../cufc-frontend/dist');
+
+// Log where we're looking for frontend files
+console.log(`Looking for frontend files in: ${buildPath}`);
+
+// Check if the directory exists and contains index.html
+const indexExists = fs.existsSync(path.join(buildPath, 'index.html'));
+console.log(`Frontend index.html exists: ${indexExists}`);
 
 // Serve static files from the React app
 app.use(express.static(buildPath));
 
 // Fallback: serve React's index.html for any unknown route (except API)
 app.get(/^\/?(?!api).*/, (_req: Request, res: Response) => {
-  res.sendFile(path.join(buildPath, 'index.html'));
+  if (indexExists) {
+    res.sendFile(path.join(buildPath, 'index.html'));
+  } else {
+    res.status(404).send('Frontend files not found. Make sure the build completed successfully.');
+  }
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT} using frontend at ${buildPath}`);
+  console.log(`Server is running on port ${PORT}`);
+  console.log(`Serving frontend from: ${buildPath}`);
 });
 
 export default app;

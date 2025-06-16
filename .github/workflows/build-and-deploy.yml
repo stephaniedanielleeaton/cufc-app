@@ -42,8 +42,17 @@ jobs:
         git config --local user.name 'github-actions[bot]'
         git config --local user.email 'github-actions[bot]@users.noreply.github.com'
     
-    - name: Commit Build Folder
+    - name: Prepare for Deployment
+      run: |
+        # Create Vite-style dist directory
+        mkdir -p cufc-frontend/dist
+        
+        # Copy frontend build to match Heroku's expected location
+        cp -r cufc-frontend/build/* cufc-frontend/dist/
+        
+    - name: Commit Build Folders
       run: |
         git add cufc-frontend/build -f
-        git commit -m "chore: update React build" || echo "No changes to commit"
+        git add cufc-frontend/dist -f
+        git commit -m "chore: update build for deployment" || echo "No changes to commit"
         git push
