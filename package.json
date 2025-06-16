@@ -6,10 +6,10 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "build": "npx tsc --project tsconfig.json",
+    "build": "npx tsc --project tsconfig.json && cd cufc-frontend && npm install && npm run build",
     "test": "jest --all",
     "test:watch": "jest --watchAll",
-    "heroku-postbuild": "npm run build",
+    "heroku-postbuild": "npm install && npm run build",
     "dev:backend": "nodemon src/index.ts",
     "dev:frontend": "cd cufc-frontend && npm start",
     "dev:all": "npm-run-all --parallel dev:backend dev:frontend",
