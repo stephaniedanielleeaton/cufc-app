@@ -31,32 +31,50 @@ app.get('/api/test', (_req: Request, res: Response) => {
   res.json({ value: 'Hello from backend!' });
 });
 
-// Use the consistent frontend build path that we're setting in GitHub workflow
-const buildPath = path.join(__dirname, '../cufc-frontend/dist');
+// Define possible paths for frontend files (in order of preference)
+const possiblePaths = [
+  path.join(__dirname, '../cufc-frontend/dist'),
+  path.join(__dirname, '../cufc-frontend/build'),
+  path.join(__dirname, '../../cufc-frontend/dist'),
+  path.join(__dirname, '../../cufc-frontend/build')
+];
 
-// Log where we're looking for frontend files
-console.log(`Looking for frontend files in: ${buildPath}`);
-
-// Check if the directory exists and contains index.html
-const indexExists = fs.existsSync(path.join(buildPath, 'index.html'));
-console.log(`Frontend index.html exists: ${indexExists}`);
-
-// Serve static files from the React app
-app.use(express.static(buildPath));
-
-// Fallback: serve React's index.html for any unknown route (except API)
-app.get(/^\/?(?!api).*/, (_req: Request, res: Response) => {
-  if (indexExists) {
-    res.sendFile(path.join(buildPath, 'index.html'));
+// Find the first valid path with index.html
+let buildPath = null;
+for (const p of possiblePaths) {
+  if (fs.existsSync(path.join(p, 'index.html'))) {
+    buildPath = p;
+    console.log(`Found frontend files at: ${buildPath}`);
+    break;
   } else {
-    res.status(404).send('Frontend files not found. Make sure the build completed successfully.');
+    console.log(`No frontend files at: ${p}`);
   }
-});
+}
+
+// Serve static files if we found them
+if (buildPath) {
+  app.use(express.static(buildPath));
+
+  // Fallback: serve React's index.html for any unknown route (except API)
+  app.get(/^\/?(?!api).*/, (_req: Request, res: Response) => {
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+} else {
+  // Just handle API routes if we can't find frontend files
+  console.error('No frontend files found in any expected location');
+  app.get(/^\/?(?!api).*/, (_req: Request, res: Response) => {
+    res.status(404).send('Frontend files not found. Check server logs for details.');
+  });
+}
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Serving frontend from: ${buildPath}`);
+  console.log(`Server running on port ${PORT}`);
+  if (buildPath) {
+    console.log(`Serving frontend from: ${buildPath}`);
+  } else {
+    console.log('WARNING: No frontend files found, only API routes will work');
+  }
 });
 
 export default app;
