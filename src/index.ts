@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api', apiRoutes);
 
 // Test endpoint
-app.get('/api/test', (req: Request, res: Response) => {
+app.get('/api/test', (_req: Request, res: Response) => {
   res.json({ value: 'Hello from backend!' });
 });
 
@@ -40,7 +40,7 @@ const buildPath = fs.existsSync(path.join(__dirname, '../cufc-frontend/build'))
 app.use(express.static(buildPath));
 
 // Fallback: serve React's index.html for any unknown route (except API)
-app.get(/^\/?(?!api).*/, (req: Request, res: Response) => {
+app.get(/^\/?(?!api).*/, (_req: Request, res: Response) => {
   res.sendFile(path.join(buildPath, 'index.html'));
 });
 
