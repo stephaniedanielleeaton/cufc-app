@@ -1,53 +1,34 @@
-jest.mock('../middleware/auth0.middleware', () => ({
-  checkJwt: (req: any, res: any, next: any) => next()
+import request from 'supertest';
+import { Request, Response, NextFunction } from 'express';
+
+// Mock the auth middleware
+jest.mock('../../src/middleware/auth0.middleware', () => ({
+  checkJwt: (_req: Request, _res: Response, next: NextFunction) => next()
 }));
 
-import request from 'supertest';
-import express from 'express';
-
-jest.mock('../utils/database', () => ({
+// Mock database connection
+jest.mock('../../src/utils/database', () => ({
   connectDB: jest.fn().mockResolvedValue(undefined),
   disconnectDB: jest.fn().mockResolvedValue(undefined)
 }));
 
+// Import the app after setting up mocks
+import app from '..';
 
+describe('App', () => {
+  it('should return 200 and a test message from /api/test', async () => {
+    const res = await request(app).get('/api/test');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('value', 'Hello from backend!');
+  });
 
-const createTestApp = () => {
- 
-  jest.isolateModules(() => {
-    require('../index');
+  it('should return 404 for non-existent API routes', async () => {
+    const res = await request(app).get('/api/non-existent-route');
+    expect(res.status).toBe(404);
   });
-  
-  const app = express();
-  app.get('/', (req, res) => {
-    res.send('CUFC Backend API is running!');
-  });
-  
-  return app;
-};
 
-describe('Express Application', () => {
-  let app: express.Application;
-  
-  beforeAll(() => {
-    app = createTestApp();
-  });
-  
-  describe('GET /', () => {
-    it('should return 200 status code', async () => {
-      const response = await request(app).get('/');
-      expect(response.status).toBe(200);
-    });
-    
-    it('should return welcome message', async () => {
-      const response = await request(app).get('/');
-      expect(response.text).toBe('CUFC Backend API is running!');
-    });
-  });
-  
-  describe('Server Initialization', () => {
-    it('should initialize Express app without errors', () => {
-      expect(app).toBeDefined();
-    });
+  it('should return 404 for root route in test environment', async () => {
+    const res = await request(app).get('/');
+    expect(res.status).toBe(404);
   });
 });

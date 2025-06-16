@@ -1,4 +1,4 @@
-import { expressjwt, Request as JWTRequest } from 'express-jwt';
+import { expressjwt } from 'express-jwt';
 import jwksRsa from 'jwks-rsa';
 import dotenv from 'dotenv';
 

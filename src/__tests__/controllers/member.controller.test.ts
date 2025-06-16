@@ -1,12 +1,13 @@
-jest.mock('../../middleware/auth0.middleware', () => ({
-  checkJwt: (req: any, res: any, next: any) => next()
-}));
-
+import { Request, Response, NextFunction } from 'express';
 import { MemberController } from '../../controllers/member.controller';
 import { MemberService } from '../../services/member.service';
-import { Request, Response } from 'express';
 import { IMember, MemberDocument } from '../../models/member.model';
 import * as expressValidator from 'express-validator';
+
+// Mock the auth middleware
+jest.mock('../../middleware/auth0.middleware', () => ({
+  checkJwt: (_req: Request, _res: Response, next: NextFunction) => next()
+}));
 
 jest.mock('../../services/member.service');
 jest.mock('express-validator', () => ({

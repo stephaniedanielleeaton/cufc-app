@@ -1,10 +1,12 @@
-jest.mock('../../middleware/auth0.middleware', () => ({
-  checkJwt: (req: any, res: any, next: any) => next()
-}));
-
-import Member, { IMember, MemberDocument } from '../../models/member.model';
+import { Request, Response, NextFunction } from 'express';
+import Member, { IMember } from '../../models/member.model';
 import { MemberService } from '../../services/member.service';
 import mongoose from 'mongoose';
+
+// Mock the auth middleware
+jest.mock('../../middleware/auth0.middleware', () => ({
+  checkJwt: (_req: Request, _res: Response, next: NextFunction) => next()
+}));
 
 jest.mock('../../models/member.model');
 
@@ -37,15 +39,10 @@ const mockMemberData: IMember = {
 describe('MemberService', () => {
   let service: MemberService;
   let memberModelMock: jest.Mocked<typeof Member>;
-  let memberInstanceMock: Partial<MemberDocument>;
 
   beforeEach(() => {
     service = new MemberService();
     memberModelMock = Member as any;
-    memberInstanceMock = {
-      save: jest.fn().mockResolvedValue({ ...mockMemberData, _id: '507f1f77bcf86cd799439011' }),
-      toObject: jest.fn().mockReturnValue(mockMemberData),
-    };
   });
 
   afterEach(() => {

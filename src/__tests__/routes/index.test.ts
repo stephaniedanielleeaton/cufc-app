@@ -1,20 +1,21 @@
+import request from 'supertest';
+import express, { Application, Request, Response, NextFunction } from 'express';
+
+// Mock the auth middleware
 jest.mock('../../middleware/auth0.middleware', () => ({
-  checkJwt: (req: any, res: any, next: any) => next()
+  checkJwt: (_req: Request, _res: Response, next: NextFunction) => next()
 }));
 
-import request from 'supertest';
-import express, { Application } from 'express';
-import apiRoutes from '../../routes';
-import memberRoutes from '../../routes/member.routes';
-
 // Mock the member routes
-jest.mock('../../routes/member.routes', () => {
-  const router = express.Router();
-  router.get('/test', (req, res) => {
-    res.status(200).json({ message: 'Member routes test endpoint' });
-  });
-  return router;
+const mockMemberRouter = express.Router();
+mockMemberRouter.get('/test', (_req: Request, res: Response) => {
+  res.status(200).json({ message: 'Member routes test endpoint' });
 });
+
+jest.mock('../../routes/member.routes', () => mockMemberRouter);
+
+// Import the routes after setting up mocks
+import apiRoutes from '../../routes';
 
 describe('API Routes Index', () => {
   let app: Application;

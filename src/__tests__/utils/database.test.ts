@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import { connectDB, disconnectDB } from '../../utils/database';
-import { config } from '../../config';
 
 // Mock mongoose
 jest.mock('mongoose', () => ({
