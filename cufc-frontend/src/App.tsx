@@ -1,51 +1,35 @@
-import React from 'react';
-import './App.css';
-import { getConfig } from './utils/config';
-import type { AppConfig } from './utils/config';
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
 
 function App() {
-  const [backendValue, setBackendValue] = React.useState('');
-  const [config, setConfig] = React.useState<AppConfig | null>(null);
-  const [configLoading, setConfigLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    // Fetch backend test value
-    fetch('/api/test')
-      .then((res) => res.json())
-      .then((data) => setBackendValue(data.value))
-      .catch(() => setBackendValue('Error connecting to backend'));
-    
-    // Fetch configuration from backend
-    getConfig()
-      .then(configData => {
-        setConfig(configData);
-        setConfigLoading(false);
-      })
-      .catch(error => {
-        console.error('Failed to load config:', error);
-        setConfigLoading(false);
-      });
-  }, []);
+  const [count, setCount] = useState(0)
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>CUFC React Frontend</h1>
+    <>
+      <div>
+        <a href="https://vite.dev" target="_blank">
+          <img src={viteLogo} className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+      </div>
+      <h1>Vite + React</h1>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
         <p>
-          <strong>Backend Test Value:</strong> {backendValue || 'Loading...'}
+          Edit <code>src/App.tsx</code> and save to test HMR
         </p>
-        <p>
-          <strong>Environment:</strong> {configLoading ? 'Loading...' : config?.environment || 'Not Set'}
-        </p>
-        <p>
-          <strong>WEB_CLIENT_TEST_VAR:</strong> {configLoading ? 'Loading...' : config?.testVar || 'Not Set'}
-        </p>
-        <p>
-          (These values are loaded from backend environment variables)
-        </p>
-      </header>
-    </div>
-  );
+      </div>
+      <p className="read-the-docs">
+        Click on the Vite and React logos to learn more
+      </p>
+    </>
+  )
 }
 
-export default App;
+export default App
