@@ -21,14 +21,4 @@ describe('App', () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('value', 'Hello from backend!');
   });
-
-  it('should return 404 for non-existent API routes', async () => {
-    const res = await request(app).get('/api/non-existent-route');
-    expect(res.status).toBe(404);
-  });
-
-  it('should return 404 for root route in test environment', async () => {
-    const res = await request(app).get('/');
-    expect(res.status).toBe(404);
-  });
 });

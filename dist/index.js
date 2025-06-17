@@ -13,7 +13,6 @@ const routes_1 = __importDefault(require("./routes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT ?? 3001;
-const isProduction = process.env.NODE_ENV === 'production';
 (0, database_1.connectDB)()
     .then(() => console.log('MongoDB connection established'))
     .catch(err => console.error('MongoDB connection error:', err));
@@ -24,22 +23,22 @@ app.use('/api', routes_1.default);
 app.get('/api/test', (_req, res) => {
     res.json({ value: 'Hello from backend!' });
 });
-if (isProduction) {
-    const viteBuildPath = path_1.default.join(__dirname, '../cufc-frontend/dist');
-    const herokuBuildPath = path_1.default.join(__dirname, '../../client/build');
-    const rootBuildPath = path_1.default.join(__dirname, '../build');
-    [viteBuildPath, herokuBuildPath, rootBuildPath].forEach(buildPath => {
-        if (fs_1.default.existsSync(path_1.default.join(buildPath, 'index.html'))) {
-            console.log(`Serving static files from ${buildPath}`);
-            app.use(express_1.default.static(buildPath));
-            app.get('*', (_req, res) => {
-                res.sendFile(path_1.default.join(buildPath, 'index.html'));
-            });
-        }
+const staticPath = path_1.default.join(process.cwd(), 'cufc-frontend', 'dist');
+console.log('Serving static files from:', staticPath);
+console.log('Path exists:', fs_1.default.existsSync(staticPath));
+console.log('Files inside:', fs_1.default.readdirSync(staticPath));
+console.log('Serving static files from:', staticPath);
+if (!fs_1.default.existsSync(path_1.default.join(staticPath, 'index.html'))) {
+    console.error('❌ index.html not found. Did you run `npm run build` in cufc-frontend?');
+}
+else {
+    app.use(express_1.default.static(staticPath));
+    app.get('/*', (_req, res) => {
+        res.sendFile(path_1.default.join(staticPath, 'index.html'));
     });
 }
 app.listen(PORT, () => {
-    console.log(`Server is running in ${isProduction ? 'production' : 'development'} mode on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
 exports.default = app;
 //# sourceMappingURL=index.js.map
