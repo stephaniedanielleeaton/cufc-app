@@ -3,6 +3,7 @@ node_modules/
 
 # Build outputs
 dist/
+dist/
 # Keep frontend build artifacts - IMPORTANT: negative patterns must come AFTER the patterns they negate
 !cufc-frontend/build/**
 !cufc-frontend/dist/**
