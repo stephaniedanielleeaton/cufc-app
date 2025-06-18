@@ -15,8 +15,8 @@
     "dev:all": "npm-run-all --parallel dev:backend dev:frontend",
     "prepare": "[ -z \"$CI\" ] && husky install || echo 'Skipping husky install in CI environment'",
     "lint": "eslint . --ext .ts",
-    "heroku-prebuild": "npm config set production false",
-    "heroku-postbuild": "cd cufc-frontend && npm install && npm run build"
+
+    "heroku-postbuild": "cd cufc-frontend && npm install --omit=optional --omit=peer && npm run build"
   },
   "husky": {
     "skipInstall": true
