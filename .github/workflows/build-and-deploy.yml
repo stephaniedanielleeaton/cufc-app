@@ -43,6 +43,8 @@ jobs:
       run: |
         cd cufc-frontend
         npm run build
+      env:
+        VITE_CUSTOM_VAR: ${{ vars.VITE_CUSTOM_VAR }}
 
     - name: Commit built frontend
       run: |
