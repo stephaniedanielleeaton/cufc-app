@@ -30,6 +30,14 @@ jobs:
     
     - name: Build Backend
       run: npm run build
+
+    - name: Commit built backend
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add dist
+        git commit -m "Build backend for deployment [skip ci]" || echo "No changes to commit"
+        git push
     
     - name: Build frontend
       run: |
