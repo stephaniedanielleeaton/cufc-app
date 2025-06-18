@@ -31,19 +31,15 @@ jobs:
     - name: Build Backend
       run: npm run build
     
-    - name: Build Frontend
+    - name: Build frontend
       run: |
         cd cufc-frontend
-        npm ci
         npm run build
-    
-    - name: Configure Git
+
+    - name: Commit built frontend
       run: |
-        git config --local user.name 'github-actions[bot]'
-        git config --local user.email 'github-actions[bot]@users.noreply.github.com'
-    
-    - name: Commit Frontend Build
-      run: |
-        git add cufc-frontend/dist -f
-        git commit -m "chore: update Vite build for deployment" || echo "No changes to commit"
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add cufc-frontend/dist
+        git commit -m "Build frontend for deployment [skip ci]" || echo "No changes to commit"
         git push
